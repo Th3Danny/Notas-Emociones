@@ -3,6 +3,8 @@ package com.example.push.emotion.data.repository
 import android.util.Log
 import com.example.push.core.network.RetrofitHelper
 import com.example.push.emotion.data.model.EmotionResponse
+import com.example.push.emotion.data.model.NewEmotionRequest
+import com.example.push.emotion.data.model.NewEmotionResponse
 import com.example.push.notes.data.model.NoteRequest
 import com.example.push.notes.data.model.NoteResponse
 import retrofit2.HttpException
@@ -27,6 +29,20 @@ class EmotionRepository(private val token: String) {
             }
         } catch (e: Exception) {
             Log.e("EmotionRepo", "Excepción al obtener emociones: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createEmotion(request: NewEmotionRequest): Result<NewEmotionResponse> {
+        return try {
+            val response = service.createEmotion("Bearer $token", request)
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP: ${response.code()} - ${response.errorBody()?.string()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("EmotionRepo", "Error al crear emoción: ${e.message}")
             Result.failure(e)
         }
     }

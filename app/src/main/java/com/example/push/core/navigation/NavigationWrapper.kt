@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.push.emotion.data.repository.EmotionRepository
 import com.example.push.emotion.presentation.EmotionViewModel
 import com.example.push.emotion.presentation.EmotionViewModelFactory
+import com.example.push.emotion.presentation.NewEmotionScreen
 import com.example.push.home.presentation.HomeUI
 import com.example.push.login.data.repository.LoginRepository
 import com.example.push.login.domain.LoginUseCase
@@ -36,6 +37,8 @@ object AppRoutes {
     const val NEW_NOTE = "new_note"
     const val HOME = "home"
     const val EMOTION_TRACKER = "emotion"
+    const val NEW_EMOTION = "new_emotion"
+
 }
 
 @Composable
@@ -90,7 +93,8 @@ fun NavigationWrapper() {
             composable(AppRoutes.HOME) {
                 HomeUI(
                     navigateToNotes = { navController.navigate(AppRoutes.NOTES) },
-                    navigateToEmotion = { /* lo que quieras */ },
+                    navigateToEmotion = { navController.navigate(AppRoutes.EMOTION_TRACKER) },
+                    navigateToNewEmotion = { navController.navigate(AppRoutes.NEW_EMOTION) },
                     onLogout = {
                         // Borrar token y userId
                         val prefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
@@ -135,6 +139,21 @@ fun NavigationWrapper() {
                     }
                 )
             }
+
+            composable(AppRoutes.NEW_EMOTION) {
+                val emotionViewModel: EmotionViewModel = viewModel(
+                    factory = EmotionViewModelFactory(EmotionRepository(token))
+                )
+
+                NewEmotionScreen(
+                    emotionViewModel = emotionViewModel,
+                    onEmotionCreated = {
+                        // Regresar a la pantalla de emociones, o a donde tú prefieras
+                        navController.popBackStack(AppRoutes.EMOTION_TRACKER, false)
+                    }
+                )
+            }
+
 
 
         }

@@ -33,7 +33,8 @@ import androidx.compose.ui.unit.sp
 fun HomeUI(
     navigateToNotes: () -> Unit,
     navigateToEmotion: () -> Unit,
-    onLogout: () -> Unit // 👈 nuevo parámetro
+    navigateToNewEmotion: () -> Unit,
+    onLogout: () -> Unit
 )
 
 {
@@ -63,7 +64,7 @@ fun HomeUI(
         }
 
         Button(
-            onClick = { navigateToEmotion() },
+            onClick = { navigateToNewEmotion() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),

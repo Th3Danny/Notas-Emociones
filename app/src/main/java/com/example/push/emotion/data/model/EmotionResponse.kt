@@ -15,3 +15,10 @@ data class EmotionListResponse(
     val http_status: String
 )
 
+data class NewEmotionResponse(
+    val data: EmotionResponse,
+    val message: String,
+    val success: Boolean,
+    val http_status: String
+)
+
