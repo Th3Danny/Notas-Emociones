@@ -1,5 +1,10 @@
 package com.example.push.notes.data.model
 
+
+data class NoteListResponse(
+    val data: List<NoteResponse>
+)
+
 data class NoteResponse(
     val id: Int,
     val content: String,

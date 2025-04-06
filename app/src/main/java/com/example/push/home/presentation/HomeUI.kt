@@ -19,10 +19,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -156,11 +159,15 @@ fun HomeUI(
                                         .background(color)
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(label, color = Color.White, fontSize = 14.sp)
+                                Text(
+                                    text = label,
+                                    color = Color.White,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
                         }
                     }
-
                 }
             }
 
@@ -196,7 +203,13 @@ fun HomeUI(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Aquí podría ir un icono para las notas
+                        // Icono para notas
+                        Icon(
+                            imageVector = Icons.Default.Create,
+                            contentDescription = "Create Note",
+                            tint = primaryGreen,
+                            modifier = Modifier.size(36.dp)
+                        )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -216,7 +229,6 @@ fun HomeUI(
                         )
                     }
                 }
-
             }
 
             // Botón adicional para registrar nueva emoción
@@ -241,7 +253,7 @@ fun HomeUI(
             // Espacio para contenido adicional
             Spacer(modifier = Modifier.weight(1f))
 
-            // Foo`ter con información de la app
+            // Footer con información de la app
             Text(
                 text = "Track your emotions and notes daily",
                 color = Color.White.copy(alpha = 0.5f),

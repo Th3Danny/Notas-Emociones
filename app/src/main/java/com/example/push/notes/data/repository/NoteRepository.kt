@@ -9,13 +9,13 @@ import com.example.push.notes.data.model.NoteResponse
 import retrofit2.HttpException
 
 
-class NoteRepository(private val token: String) {
+class NoteRepository() {
     private val notesService = RetrofitHelper.notesService
     suspend fun getNotes(): Result<List<NoteResponse>> {
         return try {
-            val response = notesService.getNotes("Bearer $token")
+            val response = notesService.getNotes()
             if (response.isSuccessful) {
-                response.body()?.let { Result.success(it) }
+                response.body()?.let { Result.success(it.data) }
                     ?: Result.failure(Exception("Response body is null"))
             } else {
                 val error = response.errorBody()?.string()
@@ -28,9 +28,10 @@ class NoteRepository(private val token: String) {
         }
     }
 
+
     suspend fun newNote(request: NewNoteRequest): Result<NewNoteResponse> {
         return try {
-            val response = notesService.newNote("Bearer $token", request)
+            val response = notesService.newNote(request)
 
             if (response.isSuccessful) {
                 val body = response.body()

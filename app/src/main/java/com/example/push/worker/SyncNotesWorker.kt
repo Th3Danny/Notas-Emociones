@@ -31,7 +31,7 @@ class SyncNotesWorker(
         val dao = db.noteDao()
         val notes = dao.getUnsyncedNotes()
 
-        val repository = NoteRepository(token)
+        val repository = NoteRepository()
 
         for (note in notes) {
             val result = repository.newNote(NewNoteRequest(note.content, note.emotionId))

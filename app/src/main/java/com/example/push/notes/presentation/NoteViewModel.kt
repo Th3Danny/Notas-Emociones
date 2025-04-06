@@ -36,10 +36,17 @@ class NoteViewModel(
     fun getNotes() {
         viewModelScope.launch {
             val result = getNotesUseCase()
-            result.onSuccess { _notes.value = it }
-            result.onFailure { _error.value = it.message ?: "Error al obtener notas" }
+            result.onSuccess {
+                Log.d("NoteViewModel", "Notas recibidas: ${it.size}")
+                _notes.value = it
+            }
+            result.onFailure {
+                Log.e("NoteViewModel", "Error al obtener notas: ${it.message}")
+                _error.value = it.message ?: "Error al obtener notas"
+            }
         }
     }
+
 
     fun createNote(context: Context, request: NewNoteRequest) {
         viewModelScope.launch {
@@ -62,7 +69,7 @@ class NoteViewModel(
                 )
                 dao.insertNote(localNote)
 
-                // ⏰ Programar sincronización
+                //  Programar sincronización
                 scheduleNoteSync(context)
 
                 _postSuccess.value = true // Se guarda localmente

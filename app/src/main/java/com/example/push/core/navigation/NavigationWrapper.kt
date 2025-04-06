@@ -40,10 +40,9 @@ object AppRoutes {
 fun NavigationWrapper() {
     val context = LocalContext.current
     val sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-    val token = sharedPrefs.getString("access_token", "") ?: ""
     val loginRepository = LoginRepository()
     val registerRepository = RegisterRepository()
-    val noteRepository = NoteRepository(token)
+    val noteRepository = NoteRepository()
     val navController = rememberNavController()
 
     val startDestination = if (sharedPrefs.getBoolean("isLoggedIn", false)) AppRoutes.HOME else AppRoutes.LOGIN
@@ -97,7 +96,8 @@ fun NavigationWrapper() {
         composable(AppRoutes.NOTES) {
             NotesUI(
                 noteViewModel = noteViewModel,
-                navigateToNewNote = { navController.navigate(AppRoutes.NEW_NOTE) }
+                navigateToNewNote = { navController.navigate(AppRoutes.NEW_NOTE) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -110,7 +110,7 @@ fun NavigationWrapper() {
         }
 
         composable(AppRoutes.NEW_NOTE) {
-            val repo = EmotionRepository(token)
+            val repo = EmotionRepository()
             val emotionViewModel: EmotionViewModel = viewModel(
                 factory = EmotionViewModelFactory(
                     repo,
@@ -121,12 +121,13 @@ fun NavigationWrapper() {
             NewNoteScreen(
                 noteViewModel = noteViewModel,
                 emotionViewModel = emotionViewModel,
-                onNoteCreated = { navController.popBackStack(AppRoutes.NOTES, false) }
+                onNoteCreated = { navController.popBackStack(AppRoutes.NOTES, false) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
         composable(AppRoutes.NEW_EMOTION) {
-            val repo = EmotionRepository(token)
+            val repo = EmotionRepository()
             val emotionViewModel: EmotionViewModel = viewModel(
                 factory = EmotionViewModelFactory(
                     repo,
@@ -146,7 +147,7 @@ fun NavigationWrapper() {
         ) { backStackEntry ->
             val emotionId = backStackEntry.arguments?.getInt("emotionId") ?: return@composable
 
-            val repo = EmotionRepository(token)
+            val repo = EmotionRepository()
             val emotionViewModel: EmotionViewModel = viewModel(
                 factory = EmotionViewModelFactory(
                     repo,

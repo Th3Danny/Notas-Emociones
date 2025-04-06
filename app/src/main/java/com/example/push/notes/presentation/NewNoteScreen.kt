@@ -5,10 +5,17 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -23,8 +30,15 @@ import com.example.push.notes.data.model.NewNoteRequest
 fun NewNoteScreen(
     noteViewModel: NoteViewModel,
     emotionViewModel: EmotionViewModel,
-    onNoteCreated: () -> Unit
+    onNoteCreated: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
+    // Definición de colores consistentes con el resto de la app
+    val primaryGreen = Color(45, 105, 24)
+    val accentGreen = Color(139, 209, 10)
+    val buttonGreen = Color(198, 241, 119)
+    val backgroundColor = Color(18, 18, 18) // Dark theme background
+
     val context = LocalContext.current
     var content by remember { mutableStateOf("") }
     var selectedEmotionId by remember { mutableStateOf<Int?>(null) }
@@ -45,90 +59,211 @@ fun NewNoteScreen(
                 Toast.makeText(context, "Nota guardada con éxito", Toast.LENGTH_SHORT).show()
                 content = ""
                 selectedEmotionId = null
-                noteViewModel.clearPostSuccess() // ← nuevo para evitar que se dispare dos veces
+                noteViewModel.clearPostSuccess()
                 onNoteCreated()
             }
-
             false -> {
                 Toast.makeText(context, "Nota guardada localmente (sin conexión)", Toast.LENGTH_LONG).show()
                 content = ""
                 selectedEmotionId = null
                 noteViewModel.clearPostSuccess()
             }
-
-            null -> Unit // obligatorio para que sea exhaustivo
+            null -> Unit
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(235, 235, 235))
-            .padding(24.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
+                    startY = 0f,
+                    endY = 2000f
+                )
+            )
     ) {
-        Text("Nueva Nota", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(20.dp))
-
-        OutlinedTextField(
-            value = content,
-            onValueChange = { content = it },
-            label = { Text("Contenido de la nota") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        EmotionDropdown(
-            emotions = emotions,
-            selectedEmotionId = selectedEmotionId,
-            onSelectEmotion = { selectedEmotionId = it }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (content.isNotBlank() && selectedEmotionId != null) {
-                    val request = NewNoteRequest(content, selectedEmotionId!!)
-                    Log.d("NewNoteScreen", "Creando nota: $request")
-                    noteViewModel.createNote(context, request)
-                } else {
-                    Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8BC34A))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
-            Text("Guardar nota", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            // Header con botón de retroceso
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { onNavigateBack() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+
+                Text(
+                    text = "New Note",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Espacio para equilibrar el layout
+                Spacer(modifier = Modifier.width(48.dp))
+            }
+
+            // Tarjeta principal para el formulario
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
+                ) {
+                    // Icono y título de la nota
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Create,
+                            contentDescription = "Create Note",
+                            tint = accentGreen,
+                            modifier = Modifier.size(28.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Text(
+                            text = "Create Your Note",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Campo de texto para la nota
+                    OutlinedTextField(
+                        value = content,
+                        onValueChange = { content = it },
+                        label = { Text("Write your thoughts here...", color = Color.White.copy(alpha = 0.7f)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentGreen,
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            focusedLabelColor = accentGreen,
+                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                            cursorColor = Color.White,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Dropdown para seleccionar emoción
+                    Text(
+                        text = "How are you feeling?",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    EmotionDropdown(
+                        emotions = emotions,
+                        selectedEmotionId = selectedEmotionId,
+                        onSelectEmotion = { selectedEmotionId = it },
+                        accentColor = accentGreen
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Botón para guardar
+                    Button(
+                        onClick = {
+                            if (content.isNotBlank() && selectedEmotionId != null) {
+                                val request = NewNoteRequest(content, selectedEmotionId!!)
+                                Log.d("NewNoteScreen", "Creando nota: $request")
+                                noteViewModel.createNote(context, request)
+                            } else {
+                                Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = buttonGreen
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "Save Note",
+                            color = primaryGreen,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }
-
 
 @Composable
 fun EmotionDropdown(
     emotions: List<EmotionResponse>,
     selectedEmotionId: Int?,
-    onSelectEmotion: (Int) -> Unit
+    onSelectEmotion: (Int) -> Unit,
+    accentColor: Color
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val selectedEmotion = emotions.find { it.id == selectedEmotionId }
 
-    Box {
+    Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedButton(
             onClick = { expanded = true },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White
+            ),
+            border = ButtonDefaults.outlinedButtonBorder.copy(
+                width = 1.dp
+            )
         ) {
-            val selectedName = emotions.find { it.id == selectedEmotionId }?.name
-            Text(text = selectedName ?: "Selecciona una emoción")
+            Text(
+                text = selectedEmotion?.name ?: "Select an emotion",
+                color = if (selectedEmotion != null) accentColor else Color.White.copy(alpha = 0.7f)
+            )
         }
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .background(Color(30, 30, 30))
         ) {
             emotions.forEach { emotion ->
                 DropdownMenuItem(
-                    text = { Text(emotion.name) },
+                    text = { Text(emotion.name, color = Color.White) },
                     onClick = {
                         onSelectEmotion(emotion.id)
                         expanded = false

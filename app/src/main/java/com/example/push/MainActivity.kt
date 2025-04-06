@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.push.core.navigation.NavigationWrapper
 import com.example.push.core.network.NetworkMonitor
+import com.example.push.core.network.RetrofitHelper
 import com.example.push.core.services.scheduleDailyNotification
+import com.example.push.core.session.SessionManager
 import com.example.push.ui.theme.PushTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +24,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         NetworkMonitor.registerNetworkCallback(applicationContext)
         enableEdgeToEdge()
-        // 🔔 Programar notificaciones diarias al iniciar la app
+
+        // Inicializar RetrofitHelper con SessionManager
+        val sessionManager = SessionManager(applicationContext)
+        RetrofitHelper.initialize(sessionManager)
+
+        // Programar notificaciones diarias al iniciar la app
         scheduleDailyNotification(applicationContext)
         setContent {
             PushTheme {
@@ -30,6 +37,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
 }

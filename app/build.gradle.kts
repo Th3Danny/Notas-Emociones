@@ -78,6 +78,9 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.2")
     implementation ("androidx.graphics:graphics-shapes:1.0.1")
 
+    // OkHttp y logging interceptor
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
         // Retrofit
         implementation("com.squareup.retrofit2:retrofit:2.9.0")

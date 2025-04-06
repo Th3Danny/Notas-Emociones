@@ -12,13 +12,13 @@ import com.example.push.notes.data.model.NoteResponse
 import retrofit2.HttpException
 
 
-class EmotionRepository(private val token: String) {
+class EmotionRepository() {
     private val service = RetrofitHelper.emotionService
 
     suspend fun getEmotions(): Result<List<EmotionResponse>> {
         Log.d("EmotionRepo", "Llamando a la API con token...")
         return try {
-            val response = service.getEmotions("Bearer $token")
+            val response = service.getEmotions()
             if (response.isSuccessful) {
                 Log.d("EmotionRepo", "Emociones cargadas con éxito")
                 Result.success(response.body()?.data ?: emptyList())
@@ -34,7 +34,7 @@ class EmotionRepository(private val token: String) {
 
     suspend fun createEmotion(request: NewEmotionRequest): Result<NewEmotionResponse> {
         return try {
-            val response = service.createEmotion("Bearer $token", request)
+            val response = service.createEmotion(request)
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
@@ -48,7 +48,7 @@ class EmotionRepository(private val token: String) {
 
     suspend fun postEmotionRecord(request:EmotionRecordRequest): Result<EmotionRecordResponse> {
         return try {
-            val response = service.postEmotionRecord("Bearer $token", request)
+            val response = service.postEmotionRecord(request)
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {
