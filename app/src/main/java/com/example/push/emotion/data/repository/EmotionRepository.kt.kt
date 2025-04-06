@@ -14,21 +14,18 @@ class EmotionRepository(private val token: String) {
     private val service = RetrofitHelper.emotionService
 
     suspend fun getEmotions(): Result<List<EmotionResponse>> {
+        Log.d("EmotionRepo", "Llamando a la API con token...")
         return try {
-            Log.d("EmotionRepo", "Llamando a la API con token...")
             val response = service.getEmotions("Bearer $token")
-
             if (response.isSuccessful) {
-                val body = response.body()
-                Log.d("EmotionRepo", "Emociones recibidas: ${body?.data?.size}")
-                Result.success(body?.data ?: emptyList())
+                Log.d("EmotionRepo", "Emociones cargadas con éxito")
+                Result.success(response.body()?.data ?: emptyList())
             } else {
-                val error = response.errorBody()?.string()
-                Log.e("EmotionRepo", "Error en la respuesta: $error")
-                Result.failure(Exception("Error HTTP ${response.code()} - $error"))
+                Log.e("EmotionRepo", "Error en la respuesta: ${response.errorBody()?.string()}")
+                Result.failure(Exception("Error HTTP ${response.code()} - ${response.errorBody()?.string()}"))
             }
         } catch (e: Exception) {
-            Log.e("EmotionRepo", "Excepción al obtener emociones: ${e.message}", e)
+            Log.e("EmotionRepo", "Excepción al obtener emociones", e)
             Result.failure(e)
         }
     }

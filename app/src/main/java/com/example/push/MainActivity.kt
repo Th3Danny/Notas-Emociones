@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.push.core.navigation.NavigationWrapper
+import com.example.push.core.network.NetworkMonitor
 import com.example.push.core.services.scheduleDailyNotification
 import com.example.push.ui.theme.PushTheme
 
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NetworkMonitor.registerNetworkCallback(applicationContext)
         enableEdgeToEdge()
         // 🔔 Programar notificaciones diarias al iniciar la app
         scheduleDailyNotification(applicationContext)

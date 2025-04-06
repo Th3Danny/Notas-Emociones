@@ -78,7 +78,7 @@ fun NewNoteScreen(
             onClick = {
                 if (content.isNotBlank() && selectedEmotionId != null) {
                     val request = NewNoteRequest(content, selectedEmotionId!!)
-                    noteViewModel.createNote(request)
+                    noteViewModel.createNote(context, request)
                 } else {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                 }
@@ -88,6 +88,7 @@ fun NewNoteScreen(
         ) {
             Text("Guardar nota", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
+
     }
 }
 

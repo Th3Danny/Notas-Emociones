@@ -26,7 +26,6 @@ class EmotionViewModel(
             repo.getEmotions().onSuccess {
                 _emotions.value = it
             }.onFailure { error ->
-                // Opcional: agregar logs
                 println(" Error al cargar emociones: ${error.message}")
             }
         }

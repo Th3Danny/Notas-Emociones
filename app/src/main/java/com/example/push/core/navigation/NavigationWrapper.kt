@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.push.emotion.data.repository.EmotionRepository
+import com.example.push.emotion.domain.PostEmotionUseCase
 import com.example.push.emotion.presentation.EmotionViewModel
 import com.example.push.emotion.presentation.EmotionViewModelFactory
 import com.example.push.emotion.presentation.NewEmotionScreen
@@ -128,7 +129,10 @@ fun NavigationWrapper() {
             composable(AppRoutes.NEW_NOTE) {
 
                 val emotionViewModel: EmotionViewModel = viewModel(
-                    factory = EmotionViewModelFactory(EmotionRepository(token))
+                    factory = EmotionViewModelFactory(
+                        EmotionRepository(token),
+                        PostEmotionUseCase(EmotionRepository(token))
+                    )
                 )
 
                 NewNoteScreen(
@@ -141,8 +145,12 @@ fun NavigationWrapper() {
             }
 
             composable(AppRoutes.NEW_EMOTION) {
+
                 val emotionViewModel: EmotionViewModel = viewModel(
-                    factory = EmotionViewModelFactory(EmotionRepository(token))
+                    factory = EmotionViewModelFactory(
+                        EmotionRepository(token),
+                        PostEmotionUseCase(EmotionRepository(token))
+                    )
                 )
 
                 NewEmotionScreen(

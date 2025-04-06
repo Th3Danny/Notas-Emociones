@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "1.9.0"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.21" apply true
     id("com.google.gms.google-services")
 
 }
@@ -63,6 +64,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //rooms
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation("com.facebook.stetho:stetho:1.6.0")
+    implementation("com.facebook.stetho:stetho-okhttp3:1.6.0")
 
     implementation("androidx.compose.ui:ui:1.5.0")
     implementation("androidx.compose.material3:material3:1.2.0")
