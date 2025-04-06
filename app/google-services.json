@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746751303124",
+    "project_id": "control-emocional",
+    "storage_bucket": "control-emocional.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746751303124:android:af3a126c343fa78e214a41",
+        "android_client_info": {
+          "package_name": "com.example.push"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3zUh_sxJnRDoZkWrTr3aru70Opkde1C0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
