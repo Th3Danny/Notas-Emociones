@@ -14,7 +14,7 @@ class SyncNotesWorker(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        // ✅ Obtener token desde SharedPreferences
+        // Obtener token desde SharedPreferences
         val sharedPrefs = applicationContext.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
         val token = sharedPrefs.getString("access_token", null)
 
