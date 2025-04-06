@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.push.notes.data.model.NewNoteRequest
 import com.example.push.notes.data.model.NoteRequest
 import com.example.push.notes.data.model.NoteResponse
 import com.example.push.notes.domain.GetNotesUseCase
@@ -34,9 +35,9 @@ class NoteViewModel(
         }
     }
 
-    fun createNote(noteRequest: NoteRequest) {
+    fun createNote(request: NewNoteRequest) {
         viewModelScope.launch {
-            val result = postNotesUseCase(noteRequest)
+            val result = postNotesUseCase(request)
             result.onSuccess {
                 _postSuccess.value = true
             }

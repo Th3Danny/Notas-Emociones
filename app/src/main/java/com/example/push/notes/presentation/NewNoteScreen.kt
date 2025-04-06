@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.presentation.EmotionViewModel
+import com.example.push.notes.data.model.NewNoteRequest
 import com.example.push.notes.data.model.NoteRequest
 
 @Composable
@@ -76,7 +77,7 @@ fun NewNoteScreen(
         Button(
             onClick = {
                 if (content.isNotBlank() && selectedEmotionId != null) {
-                    val request = NoteRequest(content, selectedEmotionId!!)
+                    val request = NewNoteRequest(content, selectedEmotionId!!)
                     noteViewModel.createNote(request)
                 } else {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()

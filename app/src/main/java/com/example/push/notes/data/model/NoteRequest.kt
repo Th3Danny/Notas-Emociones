@@ -6,3 +6,9 @@ data class NoteRequest(
     val type: String = "SITUATION"
 )
 
+data class NewNoteRequest(
+    val content: String,
+    val emotion_id: Int,
+    val type: String = "SITUATION"
+)
+

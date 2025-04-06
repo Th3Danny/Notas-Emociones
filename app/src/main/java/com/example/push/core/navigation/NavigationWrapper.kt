@@ -40,10 +40,12 @@ object AppRoutes {
 
 @Composable
 fun NavigationWrapper() {
+    val context = LocalContext.current
+    val sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+    val token = sharedPrefs.getString("access_token", "") ?: ""
     val loginRepository = LoginRepository()
     val registerRepository = RegisterRepository()
-    val noteRepository = NoteRepository()
-    val context = LocalContext.current
+    val noteRepository = NoteRepository(token)
     val navController = rememberNavController()
 
     val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
@@ -80,6 +82,7 @@ fun NavigationWrapper() {
                 postNotesUseCase = PostNotesUseCase(noteRepository)
             )
         )
+
         NavHost(
             navController = navController, startDestination = startDestination
         ) {
@@ -118,10 +121,7 @@ fun NavigationWrapper() {
                 RegisterScreen(viewModel = registerViewModel)
             }
 
-
             composable(AppRoutes.NEW_NOTE) {
-                val sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-                val token = sharedPrefs.getString("access_token", "") ?: ""
 
                 val emotionViewModel: EmotionViewModel = viewModel(
                     factory = EmotionViewModelFactory(EmotionRepository(token))
