@@ -1,6 +1,8 @@
 package com.example.push.emotion.data.datasource
 
 import com.example.push.emotion.data.model.EmotionListResponse
+import com.example.push.emotion.data.model.EmotionRecordRequest
+import com.example.push.emotion.data.model.EmotionRecordResponse
 import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.data.model.NewEmotionRequest
 import com.example.push.emotion.data.model.NewEmotionResponse
@@ -23,4 +25,10 @@ interface EmotionService {
         @Header("Authorization") token: String,
         @Body request: NewEmotionRequest
     ): Response<NewEmotionResponse>
+
+    @POST("emotion-records")
+    suspend fun postEmotionRecord(
+        @Header("Authorization") token: String,
+        @Body request: EmotionRecordRequest
+    ): Response<EmotionRecordResponse>
 }

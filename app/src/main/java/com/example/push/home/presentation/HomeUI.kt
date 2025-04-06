@@ -2,9 +2,11 @@ package com.example.push.home.presentation
 
 import android.text.style.BackgroundColorSpan
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,13 +18,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,111 +40,215 @@ fun HomeUI(
     navigateToNotes: () -> Unit,
     navigateToEmotion: () -> Unit,
     navigateToNewEmotion: () -> Unit,
+    navigateToRecordEmotion: (Int) -> Unit,
     onLogout: () -> Unit
-)
+) {
+    // Definición de colores consistentes con las otras pantallas
+    val primaryGreen = Color(45, 105, 24)
+    val accentGreen = Color(139, 209, 10)
+    val buttonGreen = Color(198, 241, 119)
+    val backgroundColor = Color(18, 18, 18) // Dark theme background
 
-{
-    Column(
+    // Colores para las emociones
+    val angerColor = Color(189, 0, 0)
+    val surpriseColor = Color(233, 108, 25)
+    val joyColor = Color(201, 205, 10)
+    val disgustColor = Color(24, 192, 9)
+    val sadnessColor = Color(6, 102, 185)
+    val fearColor = Color(134, 13, 185)
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(235, 235, 235))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
+                    startY = 0f,
+                    endY = 2000f
+                )
+            )
     ) {
-
-        Text(
-            text = "What do you want to do?",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Botones de navegación
-        Button(
-            onClick = { navigateToNotes() },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB2FF59))
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
-            Text(text = "Create Note", color = Color(0xFF1B5E20), fontSize = 18.sp)
-        }
+            // Header con título de la app
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Lumimood",
+                    color = accentGreen,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
 
-        Button(
-            onClick = { navigateToNewEmotion() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81D4FA))
-        ) {
-            Text(text = "Register Emotion", color = Color(0xFF01579B), fontSize = 18.sp)
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(
-            onClick = { onLogout() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD95C5C))
-        ) {
-            Text("Cerrar sesión", color = Color.White, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "What are you feeling today?",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-
-        LazyRow(
-            modifier = Modifier
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            items(6) { index ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxHeight()
+                Button(
+                    onClick = { onLogout() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD95C5C).copy(alpha = 0.9f)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-
-                    val color = when (index) {
-                        0 -> Color(189, 0, 0) // Anger
-                        1 -> Color(233, 108, 25, 255) // Surprise
-                        2 -> Color(201, 205, 10, 255) // Joy
-                        3 -> Color(24, 192, 9, 255) // Sadness
-                        4 -> Color(6, 102, 185, 255) // Love
-                        5 -> Color(134, 13, 185, 255) // Fear
-                        else -> Color.Gray
-                    }
-
-
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-
                     Text(
-                        text = when (index) {
-                            0 -> "Anger"
-                            1 -> "Surprise"
-                            2 -> "Happy"
-                            3 -> "Disgust"
-                            4 -> "Sad"
-                            5 -> "Fear"
-                            else -> "Unknown"
-                        },
-                        color = Color.Black,
-                        fontSize = 16.sp
+                        "Logout",
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
+
+            // Sección de bienvenida y estado de ánimo
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = "How are you feeling today?",
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 22.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        val emotions = listOf(
+                            Triple("Anger", 1, angerColor),
+                            Triple("Surprise", 2, surpriseColor),
+                            Triple("Happy", 3, joyColor),
+                            Triple("Disgust", 4, disgustColor),
+                            Triple("Sad", 5, sadnessColor),
+                            Triple("Fear", 6, fearColor)
+                        )
+
+                        items(emotions.size) { index ->
+                            val (label, emotionId, color) = emotions[index]
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .clickable { navigateToRecordEmotion(emotionId) }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .clip(CircleShape)
+                                        .background(color)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(label, color = Color.White, fontSize = 14.sp)
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            // Sección de acciones principales
+            Text(
+                text = "What would you like to do?",
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 22.sp,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(160.dp)
+                        .clickable { navigateToNotes() },
+                    colors = CardDefaults.cardColors(
+                        containerColor = buttonGreen.copy(alpha = 0.9f)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Aquí podría ir un icono para las notas
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Create Note",
+                            color = primaryGreen,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+
+                        Text(
+                            text = "Write down your thoughts",
+                            color = primaryGreen.copy(alpha = 0.7f),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+            }
+
+            // Botón adicional para registrar nueva emoción
+            Button(
+                onClick = { navigateToNewEmotion() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.15f)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Register New Emotion",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
+            // Espacio para contenido adicional
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Foo`ter con información de la app
+            Text(
+                text = "Track your emotions and notes daily",
+                color = Color.White.copy(alpha = 0.5f),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }

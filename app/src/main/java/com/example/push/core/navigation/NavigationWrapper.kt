@@ -4,32 +4,24 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.example.push.emotion.data.repository.EmotionRepository
+import com.example.push.emotion.domain.PostEmotionRecordUseCase
 import com.example.push.emotion.domain.PostEmotionUseCase
-import com.example.push.emotion.presentation.EmotionViewModel
-import com.example.push.emotion.presentation.EmotionViewModelFactory
-import com.example.push.emotion.presentation.NewEmotionScreen
+import com.example.push.emotion.presentation.*
 import com.example.push.home.presentation.HomeUI
 import com.example.push.login.data.repository.LoginRepository
 import com.example.push.login.domain.LoginUseCase
-import com.example.push.login.presentation.LoginScreen
-import com.example.push.login.presentation.LoginViewModel
-import com.example.push.login.presentation.LoginViewModelFactory
+import com.example.push.login.presentation.*
 import com.example.push.notes.data.repository.NoteRepository
 import com.example.push.notes.domain.GetNotesUseCase
 import com.example.push.notes.domain.PostNotesUseCase
-import com.example.push.notes.presentation.NewNoteScreen
-import com.example.push.notes.presentation.NoteViewModel
-import com.example.push.notes.presentation.NoteViewModelFactory
-import com.example.push.notes.presentation.NotesUI
+import com.example.push.notes.presentation.*
 import com.example.push.register.data.repository.RegisterRepository
 import com.example.push.register.domain.RegisterUseCase
-import com.example.push.register.presentation.RegisterScreen
-import com.example.push.register.presentation.RegisterViewModel
-import com.example.push.register.presentation.RegisterViewModelFactory
+import com.example.push.register.presentation.*
 
 object AppRoutes {
     const val LOGIN = "login"
@@ -39,7 +31,9 @@ object AppRoutes {
     const val HOME = "home"
     const val EMOTION_TRACKER = "emotion"
     const val NEW_EMOTION = "new_emotion"
+    const val EMOTION_RECORD = "emotion_record/{emotionId}"
 
+    fun emotionRecord(emotionId: Int) = "emotion_record/$emotionId"
 }
 
 @Composable
@@ -52,118 +46,122 @@ fun NavigationWrapper() {
     val noteRepository = NoteRepository(token)
     val navController = rememberNavController()
 
-    val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-    val target = sharedPreferences.getString("navigateTo", null)
-    val startDestination = when {
-        sharedPreferences.getBoolean("isLoggedIn", false) -> "Home"
-        else -> "Login"
-    }
+    val startDestination = if (sharedPrefs.getBoolean("isLoggedIn", false)) AppRoutes.HOME else AppRoutes.LOGIN
 
-
-    if (startDestination != null) {
-
-        // ViewModels corregidos
-        val loginViewModel: LoginViewModel = viewModel(
-            factory = LoginViewModelFactory(
-                loginUseCase = LoginUseCase(loginRepository),
-                navigateToHome = { navController.navigate(AppRoutes.HOME) },
-                context = context,
-                navigateToRegister = { navController.navigate(AppRoutes.REGISTER) }
-            )
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(
+            loginUseCase = LoginUseCase(loginRepository),
+            navigateToHome = { navController.navigate(AppRoutes.HOME) },
+            context = context,
+            navigateToRegister = { navController.navigate(AppRoutes.REGISTER) }
         )
+    )
 
-
-        val registerViewModel: RegisterViewModel = viewModel(
-            factory = RegisterViewModelFactory(
-                registerUseCase = RegisterUseCase(registerRepository),
-                navigateLogin = { navController.navigate(AppRoutes.LOGIN) { popUpTo(AppRoutes.LOGIN) } }
-            )
+    val registerViewModel: RegisterViewModel = viewModel(
+        factory = RegisterViewModelFactory(
+            registerUseCase = RegisterUseCase(registerRepository),
+            navigateLogin = {
+                navController.navigate(AppRoutes.LOGIN) {
+                    popUpTo(AppRoutes.LOGIN)
+                }
+            }
         )
+    )
 
-        val noteViewModel: NoteViewModel = viewModel(
-            factory = NoteViewModelFactory(
-                getNotesUseCase = GetNotesUseCase(noteRepository),
-                postNotesUseCase = PostNotesUseCase(noteRepository)
-            )
+    val noteViewModel: NoteViewModel = viewModel(
+        factory = NoteViewModelFactory(
+            getNotesUseCase = GetNotesUseCase(noteRepository),
+            postNotesUseCase = PostNotesUseCase(noteRepository)
         )
+    )
 
-        NavHost(
-            navController = navController, startDestination = startDestination
-        ) {
+    NavHost(navController = navController, startDestination = startDestination) {
 
-            composable(AppRoutes.HOME) {
-                HomeUI(
-                    navigateToNotes = { navController.navigate(AppRoutes.NOTES) },
-                    navigateToEmotion = { navController.navigate(AppRoutes.EMOTION_TRACKER) },
-                    navigateToNewEmotion = { navController.navigate(AppRoutes.NEW_EMOTION) },
-                    onLogout = {
-                        // Borrar token y userId
-                        val prefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-                        prefs.edit().clear().apply()
-
-                        navController.navigate(AppRoutes.LOGIN) {
-                            popUpTo(AppRoutes.LOGIN) { inclusive = true }
-                        }
+        composable(AppRoutes.HOME) {
+            HomeUI(
+                navigateToNotes = { navController.navigate(AppRoutes.NOTES) },
+                navigateToEmotion = { navController.navigate(AppRoutes.EMOTION_TRACKER) },
+                navigateToNewEmotion = { navController.navigate(AppRoutes.NEW_EMOTION) },
+                navigateToRecordEmotion = { emotionId ->
+                    navController.navigate(AppRoutes.emotionRecord(emotionId))
+                },
+                onLogout = {
+                    sharedPrefs.edit().clear().apply()
+                    navController.navigate(AppRoutes.LOGIN) {
+                        popUpTo(AppRoutes.LOGIN) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(AppRoutes.NOTES) {
+            NotesUI(
+                noteViewModel = noteViewModel,
+                navigateToNewNote = { navController.navigate(AppRoutes.NEW_NOTE) }
+            )
+        }
+
+        composable(AppRoutes.LOGIN) {
+            LoginScreen(viewModel = loginViewModel)
+        }
+
+        composable(AppRoutes.REGISTER) {
+            RegisterScreen(viewModel = registerViewModel)
+        }
+
+        composable(AppRoutes.NEW_NOTE) {
+            val repo = EmotionRepository(token)
+            val emotionViewModel: EmotionViewModel = viewModel(
+                factory = EmotionViewModelFactory(
+                    repo,
+                    PostEmotionUseCase(repo),
+                    PostEmotionRecordUseCase(repo)
                 )
-            }
+            )
+            NewNoteScreen(
+                noteViewModel = noteViewModel,
+                emotionViewModel = emotionViewModel,
+                onNoteCreated = { navController.popBackStack(AppRoutes.NOTES, false) }
+            )
+        }
 
-
-            composable(AppRoutes.NOTES) {
-                NotesUI(
-                    noteViewModel = noteViewModel,
-                    navigateToNewNote = { navController.navigate(AppRoutes.NEW_NOTE) }
+        composable(AppRoutes.NEW_EMOTION) {
+            val repo = EmotionRepository(token)
+            val emotionViewModel: EmotionViewModel = viewModel(
+                factory = EmotionViewModelFactory(
+                    repo,
+                    PostEmotionUseCase(repo),
+                    PostEmotionRecordUseCase(repo)
                 )
-            }
+            )
+            NewEmotionScreen(
+                emotionViewModel = emotionViewModel,
+                onEmotionCreated = { navController.popBackStack(AppRoutes.EMOTION_TRACKER, false) }
+            )
+        }
 
+        composable(
+            route = AppRoutes.EMOTION_RECORD,
+            arguments = listOf(navArgument("emotionId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val emotionId = backStackEntry.arguments?.getInt("emotionId") ?: return@composable
 
-
-            composable("login") {
-                LoginScreen(viewModel = loginViewModel)
-            }
-
-            composable("register") {
-                RegisterScreen(viewModel = registerViewModel)
-            }
-
-            composable(AppRoutes.NEW_NOTE) {
-
-                val emotionViewModel: EmotionViewModel = viewModel(
-                    factory = EmotionViewModelFactory(
-                        EmotionRepository(token),
-                        PostEmotionUseCase(EmotionRepository(token))
-                    )
+            val repo = EmotionRepository(token)
+            val emotionViewModel: EmotionViewModel = viewModel(
+                factory = EmotionViewModelFactory(
+                    repo,
+                    PostEmotionUseCase(repo),
+                    PostEmotionRecordUseCase(repo)
                 )
+            )
 
-                NewNoteScreen(
-                    noteViewModel = noteViewModel,
-                    emotionViewModel = emotionViewModel,
-                    onNoteCreated = {
-                        navController.popBackStack(AppRoutes.NOTES, false)
-                    }
-                )
-            }
-
-            composable(AppRoutes.NEW_EMOTION) {
-
-                val emotionViewModel: EmotionViewModel = viewModel(
-                    factory = EmotionViewModelFactory(
-                        EmotionRepository(token),
-                        PostEmotionUseCase(EmotionRepository(token))
-                    )
-                )
-
-                NewEmotionScreen(
-                    emotionViewModel = emotionViewModel,
-                    onEmotionCreated = {
-                        // Regresar a la pantalla de emociones, o a donde tú prefieras
-                        navController.popBackStack(AppRoutes.EMOTION_TRACKER, false)
-                    }
-                )
-            }
-
-
-
+            EmotionRecordScreen(
+                viewModel = emotionViewModel,
+                emotionId = emotionId,
+                onRecordSaved = {
+                    navController.popBackStack(AppRoutes.HOME, false)
+                }
+            )
         }
     }
 }

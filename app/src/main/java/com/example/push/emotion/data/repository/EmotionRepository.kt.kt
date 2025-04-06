@@ -2,6 +2,8 @@ package com.example.push.emotion.data.repository
 
 import android.util.Log
 import com.example.push.core.network.RetrofitHelper
+import com.example.push.emotion.data.model.EmotionRecordRequest
+import com.example.push.emotion.data.model.EmotionRecordResponse
 import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.data.model.NewEmotionRequest
 import com.example.push.emotion.data.model.NewEmotionResponse
@@ -43,6 +45,22 @@ class EmotionRepository(private val token: String) {
             Result.failure(e)
         }
     }
+
+    suspend fun postEmotionRecord(request:EmotionRecordRequest): Result<EmotionRecordResponse> {
+        return try {
+            val response = service.postEmotionRecord("Bearer $token", request)
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP: ${response.code()} - ${response.errorBody()?.string()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("EmotionRecordRepo", "Error al registrar emoción: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+
 }
 
 
