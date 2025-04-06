@@ -1,5 +1,6 @@
 package com.example.push.notes.presentation
 
+
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -13,11 +14,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.presentation.EmotionViewModel
 import com.example.push.notes.data.model.NewNoteRequest
-import com.example.push.notes.data.model.NoteRequest
+
 
 @Composable
 fun NewNoteScreen(
@@ -26,25 +26,37 @@ fun NewNoteScreen(
     onNoteCreated: () -> Unit
 ) {
     val context = LocalContext.current
-
     var content by remember { mutableStateOf("") }
     var selectedEmotionId by remember { mutableStateOf<Int?>(null) }
 
     val postSuccess by noteViewModel.postSuccess.observeAsState()
     val emotions by emotionViewModel.emotions.observeAsState(emptyList())
 
+    // Cargar emociones
     LaunchedEffect(Unit) {
         Log.d("NewNoteScreen", "Llamando a emotionViewModel.loadEmotions()")
         emotionViewModel.loadEmotions()
     }
 
-
+    // Manejar resultado de guardar nota
     LaunchedEffect(postSuccess) {
-        if (postSuccess == true) {
-            Toast.makeText(context, "Nota guardada correctamente", Toast.LENGTH_SHORT).show()
-            onNoteCreated()
-        } else if (postSuccess == false) {
-            Toast.makeText(context, "Error al guardar nota", Toast.LENGTH_SHORT).show()
+        when (postSuccess) {
+            true -> {
+                Toast.makeText(context, "Nota guardada con éxito", Toast.LENGTH_SHORT).show()
+                content = ""
+                selectedEmotionId = null
+                noteViewModel.clearPostSuccess() // ← nuevo para evitar que se dispare dos veces
+                onNoteCreated()
+            }
+
+            false -> {
+                Toast.makeText(context, "Nota guardada localmente (sin conexión)", Toast.LENGTH_LONG).show()
+                content = ""
+                selectedEmotionId = null
+                noteViewModel.clearPostSuccess()
+            }
+
+            null -> Unit // obligatorio para que sea exhaustivo
         }
     }
 
@@ -78,6 +90,7 @@ fun NewNoteScreen(
             onClick = {
                 if (content.isNotBlank() && selectedEmotionId != null) {
                     val request = NewNoteRequest(content, selectedEmotionId!!)
+                    Log.d("NewNoteScreen", "Creando nota: $request")
                     noteViewModel.createNote(context, request)
                 } else {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
@@ -88,9 +101,9 @@ fun NewNoteScreen(
         ) {
             Text("Guardar nota", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
-
     }
 }
+
 
 @Composable
 fun EmotionDropdown(
@@ -103,10 +116,10 @@ fun EmotionDropdown(
     Box {
         OutlinedButton(
             onClick = { expanded = true },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(emotions.find { it.id == selectedEmotionId }?.name ?: "Selecciona una emoción")
+            val selectedName = emotions.find { it.id == selectedEmotionId }?.name
+            Text(text = selectedName ?: "Selecciona una emoción")
         }
 
         DropdownMenu(

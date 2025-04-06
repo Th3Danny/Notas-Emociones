@@ -14,5 +14,9 @@ fun scheduleNoteSync(context: Context) {
         .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
         .build()
 
-    WorkManager.getInstance(context).enqueue(syncRequest)
+    WorkManager.getInstance(context).enqueueUniqueWork(
+        "note_sync_worker", //  nombre único del trabajo
+        ExistingWorkPolicy.KEEP, //  evita ejecutar más de uno al mismo tiempo
+        syncRequest
+    )
 }

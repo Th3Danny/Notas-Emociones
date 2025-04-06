@@ -69,6 +69,10 @@ class NoteViewModel(
             }
         }
     }
+    fun clearPostSuccess() {
+        _postSuccess.value = null
+    }
+
 
 
 }
