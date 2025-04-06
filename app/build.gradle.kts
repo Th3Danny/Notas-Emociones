@@ -2,10 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
     kotlin("plugin.serialization") version "1.9.0"
     id("com.google.gms.google-services")
-
 
 }
 
@@ -83,6 +81,8 @@ dependencies {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
 
     implementation("androidx.navigation:navigation-compose:2.7.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
@@ -90,5 +90,6 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-rxjava3:1.7.8")
 
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
     implementation("com.google.firebase:firebase-analytics")
 }

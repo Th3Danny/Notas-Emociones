@@ -1,7 +1,7 @@
-package com.example.push.register.data.model
+    package com.example.push.register.data.model
 
-data class RegisterResponse (
-    val id: String,
-    val username: String,
-    val email: String
-)
+    data class RegisterResponse (
+        val message: String,
+        val success: Boolean,
+        val http_status: String
+    )
