@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.push.emotion.data.repository.EmotionRepository
+import com.example.push.emotion.domain.GetWeeklyStatisticsUseCase
 import com.example.push.emotion.domain.PostEmotionRecordUseCase
 import com.example.push.emotion.domain.PostEmotionUseCase
 import com.example.push.emotion.presentation.*
@@ -32,7 +33,7 @@ object AppRoutes {
     const val EMOTION_TRACKER = "emotion"
     const val NEW_EMOTION = "new_emotion"
     const val EMOTION_RECORD = "emotion_record/{emotionId}"
-
+    const val EMOTION_STATISTICS = "emotion_statistics"
     fun emotionRecord(emotionId: Int) = "emotion_record/$emotionId"
 }
 
@@ -82,7 +83,8 @@ fun NavigationWrapper() {
                 factory = EmotionViewModelFactory(
                     repo,
                     PostEmotionUseCase(repo),
-                    PostEmotionRecordUseCase(repo)
+                    PostEmotionRecordUseCase(repo),
+                    GetWeeklyStatisticsUseCase(repo)
                 )
             )
 
@@ -92,6 +94,7 @@ fun NavigationWrapper() {
                 navigateToRecordEmotion = { emotionId ->
                     navController.navigate(AppRoutes.emotionRecord(emotionId))
                 },
+                navigateToStatistics = { navController.navigate(AppRoutes.EMOTION_STATISTICS) },
                 emotionViewModel = emotionViewModel,
                 onLogout = {
                     sharedPrefs.edit().clear().apply()
@@ -100,6 +103,20 @@ fun NavigationWrapper() {
                     }
                 }
             )
+        }
+
+        composable(AppRoutes.EMOTION_STATISTICS) {
+            val repo = EmotionRepository()
+            val emotionViewModel: EmotionViewModel = viewModel(
+                factory = EmotionViewModelFactory(
+                    repo,
+                    PostEmotionUseCase(repo),
+                    PostEmotionRecordUseCase(repo),
+                    GetWeeklyStatisticsUseCase(repo)
+                )
+            )
+
+            EmotionStatisticsScreen(viewModel = emotionViewModel)
         }
 
         composable(AppRoutes.NOTES) {
@@ -124,7 +141,8 @@ fun NavigationWrapper() {
                 factory = EmotionViewModelFactory(
                     repo,
                     PostEmotionUseCase(repo),
-                    PostEmotionRecordUseCase(repo)
+                    PostEmotionRecordUseCase(repo),
+                    GetWeeklyStatisticsUseCase(repo)
                 )
             )
             NewNoteScreen(
@@ -141,7 +159,8 @@ fun NavigationWrapper() {
                 factory = EmotionViewModelFactory(
                     repo,
                     PostEmotionUseCase(repo),
-                    PostEmotionRecordUseCase(repo)
+                    PostEmotionRecordUseCase(repo),
+                    GetWeeklyStatisticsUseCase(repo)
                 )
             )
             NewEmotionScreen(
@@ -162,9 +181,14 @@ fun NavigationWrapper() {
                 factory = EmotionViewModelFactory(
                     repo,
                     PostEmotionUseCase(repo),
-                    PostEmotionRecordUseCase(repo)
+                    PostEmotionRecordUseCase(repo),
+                    GetWeeklyStatisticsUseCase(repo)
                 )
             )
+
+
+
+
 
             EmotionRecordScreen(
                 viewModel = emotionViewModel,

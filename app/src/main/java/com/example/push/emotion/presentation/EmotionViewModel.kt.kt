@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.push.emotion.data.model.EmotionRecordRequest
 import com.example.push.emotion.data.model.EmotionResponse
+import com.example.push.emotion.data.model.EmotionStatisticsResponse
 import com.example.push.emotion.data.model.NewEmotionRequest
 import com.example.push.emotion.data.repository.EmotionRepository
+import com.example.push.emotion.domain.GetWeeklyStatisticsUseCase
 import com.example.push.emotion.domain.PostEmotionRecordUseCase
 import com.example.push.emotion.domain.PostEmotionUseCase
 import kotlinx.coroutines.launch
@@ -15,8 +17,11 @@ import kotlinx.coroutines.launch
 class EmotionViewModel(
     private val repo: EmotionRepository,
     private val postEmotionUseCase: PostEmotionUseCase,
-    private val postEmotionRecordUseCase: PostEmotionRecordUseCase
+    private val postEmotionRecordUseCase: PostEmotionRecordUseCase,
+    private val getWeeklyStatisticsUseCase: GetWeeklyStatisticsUseCase
 ) : ViewModel() {
+    private val _weeklyStats = MutableLiveData<EmotionStatisticsResponse?>()
+    val weeklyStats: LiveData<EmotionStatisticsResponse?> = _weeklyStats
 
     private val _emotions = MutableLiveData<List<EmotionResponse>>()
     val emotions: LiveData<List<EmotionResponse>> = _emotions
@@ -34,6 +39,14 @@ class EmotionViewModel(
             }.onFailure { error ->
                 println(" Error al cargar emociones: ${error.message}")
             }
+        }
+    }
+
+    fun loadWeeklyStats() {
+        viewModelScope.launch {
+            val result = getWeeklyStatisticsUseCase()
+            result.onSuccess { _weeklyStats.value = it }
+                .onFailure { println("Error al cargar estadísticas semanales: ${it.message}") }
         }
     }
 
@@ -60,6 +73,8 @@ class EmotionViewModel(
             }
         }
     }
+
+
 
     fun resetStatus() {
         _success.value = null

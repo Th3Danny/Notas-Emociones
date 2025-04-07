@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.push.core.navigation.AppRoutes
 import com.example.push.emotion.presentation.EmotionViewModel
 
 @Composable
@@ -43,6 +44,7 @@ fun HomeUI(
     navigateToNotes: () -> Unit,
     navigateToNewEmotion: () -> Unit,
     navigateToRecordEmotion: (Int) -> Unit,
+    navigateToStatistics: () -> Unit,
     emotionViewModel: EmotionViewModel,
     onLogout: () -> Unit
 ){
@@ -107,6 +109,26 @@ fun HomeUI(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = { navigateToStatistics() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.15f)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "View Weekly Statistics",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            }
+
 
             // Sección de bienvenida y estado de ánimo
             Card(

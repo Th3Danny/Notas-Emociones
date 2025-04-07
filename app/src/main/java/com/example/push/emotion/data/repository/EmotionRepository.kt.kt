@@ -5,6 +5,7 @@ import com.example.push.core.network.RetrofitHelper
 import com.example.push.emotion.data.model.EmotionRecordRequest
 import com.example.push.emotion.data.model.EmotionRecordResponse
 import com.example.push.emotion.data.model.EmotionResponse
+import com.example.push.emotion.data.model.EmotionStatisticsResponse
 import com.example.push.emotion.data.model.NewEmotionRequest
 import com.example.push.emotion.data.model.NewEmotionResponse
 import com.example.push.notes.data.model.NoteRequest
@@ -31,6 +32,20 @@ class EmotionRepository() {
             Result.failure(e)
         }
     }
+
+    suspend fun getWeeklyStatistics(): Result<EmotionStatisticsResponse> {
+        return try {
+            val response = service.getWeeklyStatistics()
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Error HTTP: ${response.code()} - ${response.errorBody()?.string()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
     suspend fun createEmotion(request: NewEmotionRequest): Result<NewEmotionResponse> {
         return try {
