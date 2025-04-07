@@ -98,6 +98,8 @@ dependencies {
     // Para notificaciones
     implementation ("androidx.core:core-ktx:1.10.0")
 
+    implementation ("com.google.android.material:material:1.11.0")
+
 
     implementation("androidx.navigation:navigation-compose:2.7.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")

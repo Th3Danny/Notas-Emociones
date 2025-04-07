@@ -146,7 +146,8 @@ fun NavigationWrapper() {
             )
             NewEmotionScreen(
                 emotionViewModel = emotionViewModel,
-                onEmotionCreated = { navController.popBackStack(AppRoutes.EMOTION_TRACKER, false) }
+                onEmotionCreated = { navController.popBackStack(AppRoutes.EMOTION_TRACKER, false) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -170,7 +171,8 @@ fun NavigationWrapper() {
                 emotionId = emotionId,
                 onRecordSaved = {
                     navController.popBackStack(AppRoutes.HOME, false)
-                }
+                },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }
