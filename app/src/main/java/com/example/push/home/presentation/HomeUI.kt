@@ -1,6 +1,7 @@
 package com.example.push.home.presentation
 
-import android.text.style.BackgroundColorSpan
+
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,38 +26,40 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.push.emotion.presentation.EmotionViewModel
 
 @Composable
 fun HomeUI(
     navigateToNotes: () -> Unit,
-    navigateToEmotion: () -> Unit,
     navigateToNewEmotion: () -> Unit,
     navigateToRecordEmotion: (Int) -> Unit,
+    emotionViewModel: EmotionViewModel,
     onLogout: () -> Unit
-) {
+){
     // Definición de colores consistentes con las otras pantallas
     val primaryGreen = Color(45, 105, 24)
     val accentGreen = Color(139, 209, 10)
     val buttonGreen = Color(198, 241, 119)
     val backgroundColor = Color(18, 18, 18) // Dark theme background
 
-    // Colores para las emociones
-    val angerColor = Color(189, 0, 0)
-    val surpriseColor = Color(233, 108, 25)
-    val joyColor = Color(201, 205, 10)
-    val disgustColor = Color(24, 192, 9)
-    val sadnessColor = Color(6, 102, 185)
-    val fearColor = Color(134, 13, 185)
+    // Obtener emociones del ViewModel
+    val emotions by emotionViewModel.emotions.observeAsState(emptyList())
+
+    // Cargar emociones al iniciar
+    LaunchedEffect(Unit) {
+        Log.d("HomeUI", "Cargando emociones...")
+        emotionViewModel.loadEmotions()
+    }
 
     Box(
         modifier = Modifier
@@ -134,33 +135,33 @@ fun HomeUI(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        val emotions = listOf(
-                            Triple("Anger", 1, angerColor),
-                            Triple("Surprise", 2, surpriseColor),
-                            Triple("Happy", 3, joyColor),
-                            Triple("Disgust", 4, disgustColor),
-                            Triple("Sad", 5, sadnessColor),
-                            Triple("Fear", 6, fearColor)
-                        )
-
+                        // Usar las emociones del backend
                         items(emotions.size) { index ->
-                            val (label, emotionId, color) = emotions[index]
+                            val emotion = emotions[index]
+
+                            // Convertir el color hexadecimal a Color
+                            val emotionColor = try {
+                                Color(android.graphics.Color.parseColor(emotion.color))
+                            } catch (e: Exception) {
+                                // Color por defecto si hay error
+                                Color.Gray
+                            }
 
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .clickable { navigateToRecordEmotion(emotionId) }
+                                    .clickable { navigateToRecordEmotion(emotion.id) }
                                     .padding(vertical = 8.dp, horizontal = 4.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .size(70.dp)
                                         .clip(CircleShape)
-                                        .background(color)
+                                        .background(emotionColor)
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = label,
+                                    text = emotion.name,
                                     color = Color.White,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium

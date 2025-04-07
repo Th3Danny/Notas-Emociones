@@ -92,6 +92,12 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
+    // Para WorkManager (notificaciones periódicas)
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
+
+    // Para notificaciones
+    implementation ("androidx.core:core-ktx:1.10.0")
+
 
     implementation("androidx.navigation:navigation-compose:2.7.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")

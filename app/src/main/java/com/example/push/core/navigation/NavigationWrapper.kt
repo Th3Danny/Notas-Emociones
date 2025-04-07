@@ -44,7 +44,7 @@ fun NavigationWrapper() {
     val registerRepository = RegisterRepository()
     val noteRepository = NoteRepository()
     val navController = rememberNavController()
-
+    val repo = EmotionRepository()
     val startDestination = if (sharedPrefs.getBoolean("isLoggedIn", false)) AppRoutes.HOME else AppRoutes.LOGIN
 
     val loginViewModel: LoginViewModel = viewModel(
@@ -77,13 +77,22 @@ fun NavigationWrapper() {
     NavHost(navController = navController, startDestination = startDestination) {
 
         composable(AppRoutes.HOME) {
+            val repo = EmotionRepository() // Ya no necesita token como parámetro con el interceptor
+            val emotionViewModel: EmotionViewModel = viewModel(
+                factory = EmotionViewModelFactory(
+                    repo,
+                    PostEmotionUseCase(repo),
+                    PostEmotionRecordUseCase(repo)
+                )
+            )
+
             HomeUI(
                 navigateToNotes = { navController.navigate(AppRoutes.NOTES) },
-                navigateToEmotion = { navController.navigate(AppRoutes.EMOTION_TRACKER) },
                 navigateToNewEmotion = { navController.navigate(AppRoutes.NEW_EMOTION) },
                 navigateToRecordEmotion = { emotionId ->
                     navController.navigate(AppRoutes.emotionRecord(emotionId))
                 },
+                emotionViewModel = emotionViewModel,
                 onLogout = {
                     sharedPrefs.edit().clear().apply()
                     navController.navigate(AppRoutes.LOGIN) {
