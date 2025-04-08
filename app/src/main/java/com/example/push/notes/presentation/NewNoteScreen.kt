@@ -1,10 +1,16 @@
 package com.example.push.notes.presentation
 
 
+import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -15,12 +21,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.presentation.EmotionViewModel
 import com.example.push.notes.data.model.NewNoteRequest
@@ -33,18 +41,48 @@ fun NewNoteScreen(
     onNoteCreated: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    // Definición de colores consistentes con el resto de la app
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+    // Colores para el tema claro
+    val primaryGreen = Color(45, 105, 24)  // Verde oscuro (para textos importantes)
+    val accentGreen = Color(139, 209, 10)  // Verde brillante (para acentos)
+    val buttonGreen = Color(198, 241, 119) // Verde claro (para botones)
+    val backgroundColor = Color.White      // Fondo blanco
+    val textColor = Color(60, 60, 60)      // Texto oscuro para mejor legibilidad
+    val cardBackground = Color(250, 250, 250) // Gris muy claro para tarjetas
 
     val context = LocalContext.current
     var content by remember { mutableStateOf("") }
     var selectedEmotionId by remember { mutableStateOf<Int?>(null) }
-
     val postSuccess by noteViewModel.postSuccess.observeAsState()
     val emotions by emotionViewModel.emotions.observeAsState(emptyList())
+    val imageUris = remember { mutableStateListOf<Uri>() }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        imageUris.clear()
+        imageUris.addAll(uris)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            imagePickerLauncher.launch("image/*")
+        } else {
+            Toast.makeText(context, "Permiso denegado para acceder a la galería", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = { uris ->
+            if (uris.isNotEmpty()) {
+                imageUris.clear()
+                imageUris.addAll(uris)
+            }
+        }
+    )
 
     // Cargar emociones
     LaunchedEffect(Unit) {
@@ -75,13 +113,7 @@ fun NewNoteScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -96,19 +128,17 @@ fun NewNoteScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = { onNavigateBack() }
-                ) {
+                IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = primaryGreen
                     )
                 }
 
                 Text(
                     text = "New Note",
-                    color = Color.White,
+                    color = textColor,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -117,16 +147,50 @@ fun NewNoteScreen(
                 Spacer(modifier = Modifier.width(48.dp))
             }
 
+
+
             // Tarjeta principal para el formulario
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = cardBackground
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
             ) {
+                // Botón para seleccionar imágenes
+                Button(onClick = {
+                    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        android.Manifest.permission.READ_MEDIA_IMAGES
+                    } else {
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    }
+
+                    permissionLauncher.launch(permission)
+                }) {
+                    Text("Seleccionar imágenes")
+                }
+                // Vista previa de imágenes seleccionadas
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(imageUris.size) { index ->
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUris[index]),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -148,7 +212,7 @@ fun NewNoteScreen(
 
                         Text(
                             text = "Create Your Note",
-                            color = Color.White,
+                            color = textColor,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -160,18 +224,18 @@ fun NewNoteScreen(
                     OutlinedTextField(
                         value = content,
                         onValueChange = { content = it },
-                        label = { Text("Write your thoughts here...", color = Color.White.copy(alpha = 0.7f)) },
+                        label = { Text("Write your thoughts here...", color = Color.Gray) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = accentGreen,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            unfocusedBorderColor = Color.LightGray,
                             focusedLabelColor = accentGreen,
-                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                            cursorColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = textColor,
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
                         )
                     )
 
@@ -180,7 +244,7 @@ fun NewNoteScreen(
                     // Dropdown para seleccionar emoción
                     Text(
                         text = "How are you feeling?",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -190,7 +254,8 @@ fun NewNoteScreen(
                         emotions = emotions,
                         selectedEmotionId = selectedEmotionId,
                         onSelectEmotion = { selectedEmotionId = it },
-                        accentColor = accentGreen
+                        accentColor = accentGreen,
+                        textColor = textColor
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -201,7 +266,7 @@ fun NewNoteScreen(
                             if (content.isNotBlank() && selectedEmotionId != null) {
                                 val request = NewNoteRequest(content, selectedEmotionId!!)
                                 Log.d("NewNoteScreen", "Creando nota: $request")
-                                noteViewModel.createNote(context, request)
+                                noteViewModel.createNote(context, request, imageUris)
                             } else {
                                 Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
                             }
@@ -232,7 +297,8 @@ fun EmotionDropdown(
     emotions: List<EmotionResponse>,
     selectedEmotionId: Int?,
     onSelectEmotion: (Int) -> Unit,
-    accentColor: Color
+    accentColor: Color,
+    textColor: Color
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selectedEmotion = emotions.find { it.id == selectedEmotionId }
@@ -242,7 +308,7 @@ fun EmotionDropdown(
             onClick = { expanded = true },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color.White
+                contentColor = textColor
             ),
             border = ButtonDefaults.outlinedButtonBorder.copy(
                 width = 1.dp
@@ -250,7 +316,7 @@ fun EmotionDropdown(
         ) {
             Text(
                 text = selectedEmotion?.name ?: "Select an emotion",
-                color = if (selectedEmotion != null) accentColor else Color.White.copy(alpha = 0.7f)
+                color = if (selectedEmotion != null) accentColor else Color.Gray
             )
         }
 
@@ -259,11 +325,31 @@ fun EmotionDropdown(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .background(Color(30, 30, 30))
+                .background(Color.White)
         ) {
             emotions.forEach { emotion ->
+                val emotionColor = try {
+                    Color(android.graphics.Color.parseColor(emotion.color))
+                } catch (e: Exception) {
+                    accentColor
+                }
+
                 DropdownMenuItem(
-                    text = { Text(emotion.name, color = Color.White) },
+                    text = {
+                        Text(
+                            emotion.name,
+                            color = textColor,
+                            fontWeight = if (emotion.id == selectedEmotionId)
+                                FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    leadingIcon = {
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .background(emotionColor, shape = RoundedCornerShape(4.dp))
+                        )
+                    },
                     onClick = {
                         onSelectEmotion(emotion.id)
                         expanded = false

@@ -43,21 +43,18 @@ fun LoginScreen(viewModel: LoginViewModel) {
     val password by viewModel.password.observeAsState("")
     val isSuccess by viewModel.isSuccess.observeAsState()
 
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+    // Colores para una paleta más equilibrada
+    val primaryBlue = Color(67, 127, 203)      // Azul medio - color principal
+    val accentOrange = Color(247, 141, 74)     // Naranja coral - acento complementario
+    val backgroundColor = Color.White           // Fondo blanco
+    val textColor = Color(50, 50, 50)          // Casi negro para texto principal
+    val cardBackground = Color(250, 250, 250)  // Gris muy claro para tarjetas
+    val borderColor = Color(220, 220, 220)     // Gris claro para bordes
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -72,21 +69,21 @@ fun LoginScreen(viewModel: LoginViewModel) {
             ) {
                 Text(
                     "Welcome to",
-                    color = primaryGreen,
+                    color = textColor,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
                     "Lumimood",
-                    color = accentGreen,
+                    color = primaryBlue,
                     fontSize = 48.sp,
                     fontWeight = FontWeight.ExtraBold,
                     textAlign = TextAlign.Center
                 )
                 Text(
                     "Track your emotions and notes",
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = textColor.copy(alpha = 0.7f),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center
@@ -100,7 +97,10 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f))
+                colors = CardDefaults.cardColors(containerColor = cardBackground),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -109,7 +109,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 ) {
                     Text(
                         "Sign In",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -119,13 +119,13 @@ fun LoginScreen(viewModel: LoginViewModel) {
                     OutlinedTextField(
                         value = email,
                         onValueChange = { viewModel.onChangeEmail(it) },
-                        placeholder = { Text("Email", color = Color.White.copy(alpha = 0.6f)) },
+                        placeholder = { Text("Email", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                            focusedBorderColor = accentGreen,
-                            unfocusedTextColor = Color.White,
-                            focusedTextColor = Color.White
+                            unfocusedBorderColor = borderColor,
+                            focusedBorderColor = primaryBlue,
+                            unfocusedTextColor = textColor,
+                            focusedTextColor = textColor
                         ),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -135,15 +135,15 @@ fun LoginScreen(viewModel: LoginViewModel) {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { viewModel.onChangePassword(it) },
-                        placeholder = { Text("Password", color = Color.White.copy(alpha = 0.6f)) },
+                        placeholder = { Text("Password", color = Color.Gray) },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                            focusedBorderColor = accentGreen,
-                            unfocusedTextColor = Color.White,
-                            focusedTextColor = Color.White
+                            unfocusedBorderColor = borderColor,
+                            focusedBorderColor = primaryBlue,
+                            unfocusedTextColor = textColor,
+                            focusedTextColor = textColor
                         ),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -152,7 +152,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
 
                     Text(
                         "Forgot password?",
-                        color = accentGreen,
+                        color = accentOrange,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier
@@ -168,12 +168,12 @@ fun LoginScreen(viewModel: LoginViewModel) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = buttonGreen),
+                        colors = ButtonDefaults.buttonColors(containerColor = accentOrange),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             "LOGIN",
-                            color = primaryGreen,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -189,13 +189,13 @@ fun LoginScreen(viewModel: LoginViewModel) {
             ) {
                 Text(
                     text = "Don't have an account?",
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = textColor.copy(alpha = 0.7f),
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Sign up",
-                    color = accentGreen,
+                    color = primaryBlue,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .clickable { viewModel.navigateRegister() }

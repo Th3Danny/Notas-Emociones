@@ -47,11 +47,13 @@ fun NotesUI(
     navigateToNewNote: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    // Definición de colores consistentes con las otras pantallas
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+    // Colores para el tema claro
+    val primaryGreen = Color(45, 105, 24)  // Verde oscuro (para textos importantes)
+    val accentGreen = Color(139, 209, 10)  // Verde brillante (para acentos)
+    val buttonGreen = Color(198, 241, 119) // Verde claro (para botones)
+    val backgroundColor = Color.White      // Fondo blanco
+    val textColor = Color(60, 60, 60)      // Texto oscuro para mejor legibilidad
+    val cardBackground = Color(250, 250, 250) // Gris muy claro para tarjetas
 
     val notes by noteViewModel.notes.observeAsState(emptyList())
 
@@ -64,13 +66,7 @@ fun NotesUI(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -85,19 +81,17 @@ fun NotesUI(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = { onNavigateBack() }
-                ) {
+                IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = primaryGreen
                     )
                 }
 
                 Text(
                     text = "Your Notes",
-                    color = Color.White,
+                    color = textColor,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -105,7 +99,6 @@ fun NotesUI(
                 // Espacio para equilibrar el layout
                 Spacer(modifier = Modifier.width(48.dp))
             }
-
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -120,7 +113,7 @@ fun NotesUI(
                 ) {
                     Text(
                         text = "No notes yet. Create your first note!",
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = Color.Gray,
                         fontSize = 16.sp
                     )
                 }
@@ -131,7 +124,7 @@ fun NotesUI(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(notes) { note ->
-                        NoteCard(note = note)
+                        NoteCard(note = note, textColor = textColor, cardBackground = cardBackground)
                     }
                 }
             }
@@ -144,7 +137,7 @@ fun NotesUI(
                 .padding(24.dp)
                 .align(Alignment.BottomEnd),
             containerColor = accentGreen,
-            contentColor = primaryGreen
+            contentColor = Color.White
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -155,17 +148,21 @@ fun NotesUI(
 }
 
 @Composable
-fun NoteCard(note: NoteResponse) {
-    val primaryGreen = Color(45, 105, 24)
-    val cardBackground = Color.White.copy(alpha = 0.1f)
-
+fun NoteCard(
+    note: NoteResponse,
+    textColor: Color,
+    cardBackground: Color
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = cardBackground
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
     ) {
         Column(
             modifier = Modifier
@@ -175,7 +172,7 @@ fun NoteCard(note: NoteResponse) {
             // Contenido de la nota
             Text(
                 text = note.content,
-                color = Color.White,
+                color = textColor,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 overflow = TextOverflow.Ellipsis,

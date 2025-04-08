@@ -116,7 +116,8 @@ fun NavigationWrapper() {
                 )
             )
 
-            EmotionStatisticsScreen(viewModel = emotionViewModel)
+            EmotionStatisticsScreen(viewModel = emotionViewModel,
+                onNavigateBack = { navController.popBackStack() })
         }
 
         composable(AppRoutes.NOTES) {
@@ -185,9 +186,6 @@ fun NavigationWrapper() {
                     GetWeeklyStatisticsUseCase(repo)
                 )
             )
-
-
-
 
 
             EmotionRecordScreen(

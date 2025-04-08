@@ -55,11 +55,14 @@ fun NewEmotionScreen(
     onEmotionCreated: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    // Definición de colores consistentes con las otras pantallas
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+    // Colores para el tema claro
+    val primaryGreen = Color(45, 105, 24)      // Verde oscuro (para textos importantes)
+    val accentGreen = Color(139, 209, 10)      // Verde brillante (para acentos)
+    val buttonGreen = Color(198, 241, 119)     // Verde claro (para botones)
+    val backgroundColor = Color.White           // Fondo blanco
+    val textColor = Color(60, 60, 60)          // Texto oscuro para mejor legibilidad
+    val cardBackground = Color(250, 250, 250)  // Gris muy claro para tarjetas
+    val lightBorder = Color(230, 230, 230)     // Gris claro para bordes
 
     val context = LocalContext.current
     var name by remember { mutableStateOf("") }
@@ -113,13 +116,7 @@ fun NewEmotionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -140,13 +137,13 @@ fun NewEmotionScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = primaryGreen
                     )
                 }
 
                 Text(
                     text = "Create New Emotion",
-                    color = Color.White,
+                    color = textColor,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -161,9 +158,12 @@ fun NewEmotionScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = cardBackground
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -185,7 +185,7 @@ fun NewEmotionScreen(
                             )
                             .border(
                                 width = 2.dp,
-                                color = Color.White.copy(alpha = 0.3f),
+                                color = lightBorder,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -204,16 +204,16 @@ fun NewEmotionScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Emotion Name", color = Color.White.copy(alpha = 0.7f)) },
+                        label = { Text("Emotion Name", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = accentGreen,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            unfocusedBorderColor = lightBorder,
                             focusedLabelColor = accentGreen,
-                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                            cursorColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = textColor,
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
                         )
                     )
 
@@ -222,16 +222,16 @@ fun NewEmotionScreen(
                     OutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
-                        label = { Text("Description", color = Color.White.copy(alpha = 0.7f)) },
+                        label = { Text("Description", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = accentGreen,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            unfocusedBorderColor = lightBorder,
                             focusedLabelColor = accentGreen,
-                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                            cursorColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = textColor,
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
                         )
                     )
 
@@ -240,7 +240,7 @@ fun NewEmotionScreen(
                     // Selector de color
                     Text(
                         text = "Choose a Color",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.align(Alignment.Start)
@@ -257,16 +257,16 @@ fun NewEmotionScreen(
                                 color = newColor
                             }
                         },
-                        label = { Text("Hexadecimal Color Code", color = Color.White.copy(alpha = 0.7f)) },
+                        label = { Text("Hexadecimal Color Code", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = accentGreen,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            unfocusedBorderColor = lightBorder,
                             focusedLabelColor = accentGreen,
-                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                            cursorColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = textColor,
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
                         ),
                         trailingIcon = {
                             Box(
@@ -288,7 +288,7 @@ fun NewEmotionScreen(
 
                     Text(
                         text = "Quick Colors",
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = textColor.copy(alpha = 0.7f),
                         fontSize = 14.sp,
                         modifier = Modifier.align(Alignment.Start)
                     )
@@ -314,7 +314,7 @@ fun NewEmotionScreen(
                                     )
                                     .border(
                                         width = if (isSelected) 2.dp else 0.dp,
-                                        color = if (isSelected) Color.White else Color.Transparent,
+                                        color = if (isSelected) primaryGreen else Color.Transparent,
                                         shape = CircleShape
                                     )
                                     .clickable { color = predefinedColor }
@@ -327,7 +327,7 @@ fun NewEmotionScreen(
                     // Selector de icono simplificado
                     Text(
                         text = "Choose an Icon",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.align(Alignment.Start)
@@ -352,13 +352,13 @@ fun NewEmotionScreen(
                                     modifier = Modifier
                                         .size(40.dp)
                                         .clip(CircleShape)
-                                        .background(if (isSelected) accentGreen else Color.White.copy(alpha = 0.2f)),
+                                        .background(if (isSelected) accentGreen else Color.LightGray.copy(alpha = 0.5f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Star,
                                         contentDescription = iconName,
-                                        tint = if (isSelected) Color.Black else Color.White
+                                        tint = if (isSelected) Color.White else textColor.copy(alpha = 0.7f)
                                     )
                                 }
 
@@ -366,7 +366,7 @@ fun NewEmotionScreen(
 
                                 Text(
                                     text = iconName.split("-").last().take(5),
-                                    color = Color.White.copy(alpha = 0.7f),
+                                    color = textColor.copy(alpha = 0.7f),
                                     fontSize = 10.sp
                                 )
                             }

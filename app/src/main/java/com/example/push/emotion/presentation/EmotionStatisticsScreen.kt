@@ -28,11 +28,13 @@ fun EmotionStatisticsScreen(
     viewModel: EmotionViewModel,
     onNavigateBack: () -> Unit = {}
 ) {
-    // Definición de colores consistentes
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18)
+    // Colores definidos en el HomeUI
+    val primaryGreen = Color(45, 105, 24)  // Verde oscuro (para textos importantes)
+    val accentGreen = Color(139, 209, 10)  // Verde brillante (para acentos)
+    val buttonGreen = Color(198, 241, 119) // Verde claro (para botones)
+    val backgroundColor = Color.White      // Fondo blanco
+    val textColor = Color(60, 60, 60)      // Texto oscuro para mejor legibilidad
+    val cardBackground = Color(250, 250, 250) // Gris muy claro para tarjetas
 
     // Estado de datos
     val stats by viewModel.weeklyStats.observeAsState()
@@ -46,13 +48,7 @@ fun EmotionStatisticsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -72,13 +68,13 @@ fun EmotionStatisticsScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = primaryGreen
                     )
                 }
 
                 Text(
-                    text = "Weekly Emotion Statistics",
-                    color = Color.White,
+                    text = "Weekly Statistics",
+                    color = textColor,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -95,18 +91,21 @@ fun EmotionStatisticsScreen(
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.1f)
+                            containerColor = cardBackground
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 2.dp
+                        )
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(20.dp)
                         ) {
                             Text(
-                                text = "Summary",
-                                color = Color.White,
+                                text = "Emotion Summary",
+                                color = textColor,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -139,14 +138,14 @@ fun EmotionStatisticsScreen(
 
                                     Text(
                                         text = emotionName,
-                                        color = Color.White,
+                                        color = textColor,
                                         fontSize = 16.sp,
                                         modifier = Modifier.weight(1f)
                                     )
 
                                     Text(
                                         text = count.toString(),
-                                        color = Color.White,
+                                        color = textColor,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -155,7 +154,7 @@ fun EmotionStatisticsScreen(
                                 if (emotionName != counts.keys.last()) {
                                     Divider(
                                         modifier = Modifier.padding(vertical = 4.dp),
-                                        color = Color.White.copy(alpha = 0.1f)
+                                        color = Color.LightGray
                                     )
                                 }
                             }
@@ -167,7 +166,7 @@ fun EmotionStatisticsScreen(
             // Emociones diarias
             Text(
                 text = "Daily Records",
-                color = Color.White,
+                color = textColor,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
@@ -189,18 +188,21 @@ fun EmotionStatisticsScreen(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.1f)
+                            containerColor = cardBackground
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 2.dp
+                        )
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(20.dp)
                         ) {
                             Text(
                                 text = date,
-                                color = Color.White,
+                                color = textColor,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -210,7 +212,7 @@ fun EmotionStatisticsScreen(
                             if (day.emotions.isEmpty()) {
                                 Text(
                                     text = "No emotions recorded",
-                                    color = Color.White.copy(alpha = 0.5f),
+                                    color = Color.Gray,
                                     fontSize = 14.sp,
                                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                                 )
@@ -240,7 +242,7 @@ fun EmotionStatisticsScreen(
 
                                         Text(
                                             text = emotionName,
-                                            color = Color.White,
+                                            color = textColor,
                                             fontSize = 15.sp,
                                             modifier = Modifier.weight(1f)
                                         )
@@ -248,7 +250,7 @@ fun EmotionStatisticsScreen(
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(16.dp))
-                                                .background(emotionColor.copy(alpha = 0.2f))
+                                                .background(emotionColor.copy(alpha = 0.15f))
                                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                         ) {
                                             Text(
@@ -271,9 +273,12 @@ fun EmotionStatisticsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
+                        containerColor = cardBackground
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 2.dp
+                    )
                 ) {
                     Column(
                         modifier = Modifier
@@ -290,7 +295,7 @@ fun EmotionStatisticsScreen(
 
                         Text(
                             text = "Loading emotion statistics...",
-                            color = Color.White,
+                            color = textColor,
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )

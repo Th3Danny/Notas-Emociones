@@ -9,7 +9,8 @@ data class NoteEntity(
     val content: String,
     val emotionId: Int,
     val type: String = "SITUATION",
-    val synced: Boolean = false // ← importante para sincronización
+    val synced: Boolean = false ,
+    val imagePaths: String = ""
 )
 
 

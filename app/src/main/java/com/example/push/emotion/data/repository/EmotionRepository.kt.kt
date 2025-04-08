@@ -8,9 +8,7 @@ import com.example.push.emotion.data.model.EmotionResponse
 import com.example.push.emotion.data.model.EmotionStatisticsResponse
 import com.example.push.emotion.data.model.NewEmotionRequest
 import com.example.push.emotion.data.model.NewEmotionResponse
-import com.example.push.notes.data.model.NoteRequest
-import com.example.push.notes.data.model.NoteResponse
-import retrofit2.HttpException
+
 
 
 class EmotionRepository() {

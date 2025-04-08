@@ -31,16 +31,18 @@ fun EmotionRecordScreen(
     onRecordSaved: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    // Definición de colores consistentes con otras pantallas
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+    // Colores definidos en el HomeUI
+    val primaryGreen = Color(45, 105, 24)  // Verde oscuro (para textos importantes)
+    val accentGreen = Color(139, 209, 10)  // Verde brillante (para acentos)
+    val buttonGreen = Color(198, 241, 119) // Verde claro (para botones)
+    val backgroundColor = Color.White      // Fondo blanco
+    val textColor = Color(60, 60, 60)      // Texto oscuro para mejor legibilidad
+    val cardBackground = Color(250, 250, 250) // Gris muy claro para tarjetas
 
-    // Colores para diferentes intensidades
-    val lowColor = Color(76, 175, 80).copy(alpha = 0.7f)
-    val mediumColor = Color(255, 152, 0).copy(alpha = 0.7f)
-    val highColor = Color(244, 67, 54).copy(alpha = 0.7f)
+    // Colores para diferentes intensidades con menos saturación
+    val lowColor = Color(76, 175, 80).copy(alpha = 0.7f)   // Verde menos intenso
+    val mediumColor = Color(255, 152, 0).copy(alpha = 0.7f) // Naranja menos intenso
+    val highColor = Color(244, 67, 54).copy(alpha = 0.7f)   // Rojo menos intenso
 
     val context = LocalContext.current
     var note by remember { mutableStateOf("") }
@@ -79,13 +81,7 @@ fun EmotionRecordScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -104,14 +100,14 @@ fun EmotionRecordScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = primaryGreen
                     )
                 }
 
                 Text(
                     text = "Record Emotion",
-                    color = Color.White,
-                    fontSize = 24.sp,
+                    color = textColor,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -125,9 +121,12 @@ fun EmotionRecordScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = cardBackground
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -158,7 +157,7 @@ fun EmotionRecordScreen(
 
                         Text(
                             text = emotion.name,
-                            color = Color.White,
+                            color = textColor,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -166,7 +165,7 @@ fun EmotionRecordScreen(
                         emotion.description?.let { desc ->
                             Text(
                                 text = desc,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = Color.Gray,
                                 fontSize = 14.sp
                             )
                         }
@@ -180,7 +179,7 @@ fun EmotionRecordScreen(
                     // Selector de intensidad
                     Text(
                         text = "How intense is this emotion?",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.align(Alignment.Start)
@@ -193,26 +192,47 @@ fun EmotionRecordScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        IntensityButton(
-                            text = "LOW",
-                            isSelected = intensity == "LOW",
-                            color = lowColor,
-                            onClick = { intensity = "LOW" }
-                        )
+                        Button(
+                            onClick = { intensity = "LOW" },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (intensity == "LOW") lowColor else Color.LightGray
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.width(90.dp)
+                        ) {
+                            Text(
+                                text = "LOW",
+                                color = if (intensity == "LOW") Color.White else Color.DarkGray
+                            )
+                        }
 
-                        IntensityButton(
-                            text = "MEDIUM",
-                            isSelected = intensity == "MEDIUM",
-                            color = mediumColor,
-                            onClick = { intensity = "MEDIUM" }
-                        )
+                        Button(
+                            onClick = { intensity = "MEDIUM" },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (intensity == "MEDIUM") mediumColor else Color.LightGray
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.width(90.dp)
+                        ) {
+                            Text(
+                                text = "MEDIUM",
+                                color = if (intensity == "MEDIUM") Color.White else Color.DarkGray
+                            )
+                        }
 
-                        IntensityButton(
-                            text = "HIGH",
-                            isSelected = intensity == "HIGH",
-                            color = highColor,
-                            onClick = { intensity = "HIGH" }
-                        )
+                        Button(
+                            onClick = { intensity = "HIGH" },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (intensity == "HIGH") highColor else Color.LightGray
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.width(90.dp)
+                        ) {
+                            Text(
+                                text = "HIGH",
+                                color = if (intensity == "HIGH") Color.White else Color.DarkGray
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -220,7 +240,7 @@ fun EmotionRecordScreen(
                     // Campo para nota
                     Text(
                         text = "Add a note about how you feel",
-                        color = Color.White,
+                        color = textColor,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.align(Alignment.Start)
@@ -231,18 +251,18 @@ fun EmotionRecordScreen(
                     OutlinedTextField(
                         value = note,
                         onValueChange = { note = it },
-                        label = { Text("What's on your mind?", color = Color.White.copy(alpha = 0.7f)) },
+                        label = { Text("What's on your mind?", color = Color.Gray) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(150.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = accentGreen,
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                            unfocusedBorderColor = Color.LightGray,
                             focusedLabelColor = accentGreen,
-                            unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                            cursorColor = Color.White,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = textColor,
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor
                         )
                     )
 
@@ -268,13 +288,13 @@ fun EmotionRecordScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = buttonGreen
+                            containerColor = accentGreen
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
                             text = "Save Record",
-                            color = primaryGreen,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -285,25 +305,3 @@ fun EmotionRecordScreen(
     }
 }
 
-@Composable
-fun IntensityButton(
-    text: String,
-    isSelected: Boolean,
-    color: Color,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) color else Color.White.copy(alpha = 0.1f),
-            contentColor = if (isSelected) Color.White else Color.White.copy(alpha = 0.7f)
-        ),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.width(90.dp)
-    ) {
-        Text(
-            text = text,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}

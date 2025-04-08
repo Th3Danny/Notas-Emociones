@@ -5,8 +5,11 @@ import androidx.room.Room
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.push.core.data.local.NoteDatabase
+import com.example.push.core.network.RetrofitHelper
+import com.example.push.core.session.SessionManager
 import com.example.push.notes.data.model.NewNoteRequest
 import com.example.push.notes.data.repository.NoteRepository
+import java.io.File
 
 class SyncNotesWorker(
     appContext: Context,
@@ -26,7 +29,13 @@ class SyncNotesWorker(
             applicationContext,
             NoteDatabase::class.java,
             "note_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
+
+        // 💡 Inicializa Retrofit aquí también
+        val sessionManager = SessionManager(applicationContext)
+        RetrofitHelper.initialize(sessionManager)
+
 
         val dao = db.noteDao()
         val notes = dao.getUnsyncedNotes()
@@ -34,12 +43,29 @@ class SyncNotesWorker(
         val repository = NoteRepository()
 
         for (note in notes) {
-            val result = repository.newNote(NewNoteRequest(note.content, note.emotionId))
+            val imageFiles = note.imagePaths
+                ?.split(",")
+                ?.mapNotNull { path ->
+                    val file = File(path)
+                    if (file.exists()) file else null
+                } ?: emptyList()
+
+            val result = repository.newNote(
+                content = note.content,
+                emotionId = note.emotionId,
+                type = note.type,
+                imageFiles = imageFiles
+            )
+
             if (result.isSuccess) {
                 dao.markAsSynced(note.id)
+
+                // Eliminar imágenes temporales después de sincronizar
+                imageFiles.forEach { it.delete() }
             }
         }
 
+        db.close()
         return Result.success()
     }
 }

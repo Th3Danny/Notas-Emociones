@@ -47,32 +47,27 @@ fun HomeUI(
     navigateToStatistics: () -> Unit,
     emotionViewModel: EmotionViewModel,
     onLogout: () -> Unit
-){
-    // Definición de colores consistentes con las otras pantallas
-    val primaryGreen = Color(45, 105, 24)
-    val accentGreen = Color(139, 209, 10)
-    val buttonGreen = Color(198, 241, 119)
-    val backgroundColor = Color(18, 18, 18) // Dark theme background
+) {
+    // Colores para una paleta más equilibrada
+    val primaryBlue = Color(67, 127, 203)      // Azul medio - color principal
+    val accentOrange = Color(247, 141, 74)     // Naranja coral - acento complementario
+    val buttonLight = Color(240, 240, 240)     // Gris claro para botones secundarios
+    val backgroundColor = Color.White           // Fondo blanco
+    val textColor = Color(50, 50, 50)          // Casi negro para texto principal
+    val cardBackground = Color(250, 250, 250)  // Gris muy claro para tarjetas
 
     // Obtener emociones del ViewModel
     val emotions by emotionViewModel.emotions.observeAsState(emptyList())
 
     // Cargar emociones al iniciar
     LaunchedEffect(Unit) {
-        Log.d("HomeUI", "Cargando emociones...")
         emotionViewModel.loadEmotions()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(backgroundColor, backgroundColor.copy(alpha = 0.8f)),
-                    startY = 0f,
-                    endY = 2000f
-                )
-            )
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -89,7 +84,7 @@ fun HomeUI(
             ) {
                 Text(
                     text = "Lumimood",
-                    color = accentGreen,
+                    color = primaryBlue,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -97,7 +92,7 @@ fun HomeUI(
                 Button(
                     onClick = { onLogout() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFD95C5C).copy(alpha = 0.9f)
+                        containerColor = Color(0xFFD95C5C) // Rojo para logout
                     ),
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -109,15 +104,17 @@ fun HomeUI(
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Botón de estadísticas
             Button(
                 onClick = { navigateToStatistics() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.15f)
+                    containerColor = primaryBlue
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -129,16 +126,18 @@ fun HomeUI(
                 )
             }
 
-
-            // Sección de bienvenida y estado de ánimo
+            // Sección de emociones
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp),
+                    .padding(vertical = 16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = cardBackground
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -147,7 +146,7 @@ fun HomeUI(
                 ) {
                     Text(
                         text = "How are you feeling today?",
-                        color = Color.White,
+                        color = textColor,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 22.sp,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -157,15 +156,11 @@ fun HomeUI(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Usar las emociones del backend
                         items(emotions.size) { index ->
                             val emotion = emotions[index]
-
-                            // Convertir el color hexadecimal a Color
                             val emotionColor = try {
                                 Color(android.graphics.Color.parseColor(emotion.color))
                             } catch (e: Exception) {
-                                // Color por defecto si hay error
                                 Color.Gray
                             }
 
@@ -173,7 +168,7 @@ fun HomeUI(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
                                     .clickable { navigateToRecordEmotion(emotion.id) }
-                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                                    .padding(vertical = 8.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -184,7 +179,7 @@ fun HomeUI(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = emotion.name,
-                                    color = Color.White,
+                                    color = textColor,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -197,7 +192,7 @@ fun HomeUI(
             // Sección de acciones principales
             Text(
                 text = "What would you like to do?",
-                color = Color.White,
+                color = textColor,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 22.sp,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -215,9 +210,12 @@ fun HomeUI(
                         .height(160.dp)
                         .clickable { navigateToNotes() },
                     colors = CardDefaults.cardColors(
-                        containerColor = buttonGreen.copy(alpha = 0.9f)
+                        containerColor = buttonLight
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 2.dp
+                    )
                 ) {
                     Column(
                         modifier = Modifier
@@ -226,27 +224,22 @@ fun HomeUI(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Icono para notas
                         Icon(
                             imageVector = Icons.Default.Create,
                             contentDescription = "Create Note",
-                            tint = primaryGreen,
+                            tint = primaryBlue,
                             modifier = Modifier.size(36.dp)
                         )
-
                         Spacer(modifier = Modifier.height(12.dp))
-
                         Text(
                             text = "Create Note",
-                            color = primaryGreen,
+                            color = primaryBlue,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            fontWeight = FontWeight.Bold
                         )
-
                         Text(
                             text = "Write down your thoughts",
-                            color = primaryGreen.copy(alpha = 0.7f),
+                            color = textColor.copy(alpha = 0.7f),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -254,14 +247,14 @@ fun HomeUI(
                 }
             }
 
-            // Botón adicional para registrar nueva emoción
+            // Botón para nueva emoción
             Button(
                 onClick = { navigateToNewEmotion() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.15f)
+                    containerColor = accentOrange
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -273,13 +266,12 @@ fun HomeUI(
                 )
             }
 
-            // Espacio para contenido adicional
             Spacer(modifier = Modifier.weight(1f))
 
-            // Footer con información de la app
+            // Footer con texto oscuro
             Text(
                 text = "Track your emotions and notes daily",
-                color = Color.White.copy(alpha = 0.5f),
+                color = textColor.copy(alpha = 0.6f),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
