@@ -11,7 +11,8 @@ data class NoteResponse(
     val emotion: Emotion,
     val note_date: String,
     val type: String,
-    val created_at: String
+    val created_at: String,
+    val image_paths: List<String>? = null
 )
 
 data class Emotion(
