@@ -15,8 +15,8 @@ fun scheduleNoteSync(context: Context) {
         .build()
 
     WorkManager.getInstance(context).enqueueUniqueWork(
-        "note_sync_worker", //  nombre único del trabajo
-        ExistingWorkPolicy.KEEP, //  evita ejecutar más de uno al mismo tiempo
+        "note_sync_worker",
+        ExistingWorkPolicy.KEEP,
         syncRequest
     )
 }

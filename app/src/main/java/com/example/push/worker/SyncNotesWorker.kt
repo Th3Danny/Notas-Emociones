@@ -22,7 +22,7 @@ class SyncNotesWorker(
         val token = sharedPrefs.getString("access_token", null)
 
         if (token.isNullOrEmpty()) {
-            return Result.failure() // No se puede sincronizar sin token
+            return Result.failure()
         }
 
         val db = Room.databaseBuilder(

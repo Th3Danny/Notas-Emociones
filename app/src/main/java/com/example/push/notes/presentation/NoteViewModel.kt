@@ -62,13 +62,14 @@ class NoteViewModel(
             try {
                 val imageFiles = imageUris.mapNotNull { uri ->
                     try {
-                        val file = File.createTempFile("note_img_", ".jpg", context.cacheDir).apply {
-                            context.contentResolver.openInputStream(uri)?.use { input ->
-                                FileOutputStream(this).use { output ->
-                                    input.copyTo(output)
+                        val file =
+                            File.createTempFile("note_img_", ".jpg", context.cacheDir).apply {
+                                context.contentResolver.openInputStream(uri)?.use { input ->
+                                    FileOutputStream(this).use { output ->
+                                        input.copyTo(output)
+                                    }
                                 }
                             }
-                        }
                         file
                     } catch (e: Exception) {
                         Log.e("NoteViewModel", "Error al procesar imagen $uri", e)
@@ -108,7 +109,6 @@ class NoteViewModel(
     fun clearPostSuccess() {
         _postSuccess.value = null
     }
-
 
 
 }
